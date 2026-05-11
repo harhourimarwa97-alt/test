@@ -10,13 +10,16 @@ import io.cucumber.junit.CucumberOptions;
 @CucumberOptions(
 		features ="src\\test\\resources\\Features\\Supprimer.feature",
 		glue="StepDefErudaxis",
-		plugin = {"pretty","html:target/cucumber/report.html"}
+		plugin = {"pretty",
+				  "html:target/cucumber/report.html",
+				 "json:target/cucumber/report.json"
+				 }
 		
 		
 		) 
 
 
-public class Runner {
+public class TestRunner {
 	
 
 }
