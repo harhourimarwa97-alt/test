@@ -8,7 +8,7 @@ import io.cucumber.junit.CucumberOptions;
 @RunWith(Cucumber.class)
 
 @CucumberOptions(
-		features ="src\\test\\resources\\Features\\login.feature",
+		features ="src\\test\\resources\\Features\\Consultation.feature",
 		glue="StepDefErudaxis",
 		plugin = {"pretty",
 				  "html:target/cucumber/report.html",
