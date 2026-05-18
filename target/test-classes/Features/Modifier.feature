@@ -11,18 +11,19 @@ Background:
     And   utilisateur clique sur le sous-sous-sous-menu "Salaires"
     
 
- Scenario Outline: Modifier un salaire permanent
-    Given je suis sur la page de consultation des salaires
+ 
 
-    When je cherche une ligne avec le type "<type>" et le statut "<statut>"
+  Scenario Outline: Modifier le montant d un salaire de type Permanent en statut En cours
 
-    Then l'icône de modification est visible
+Given un salaire de nom "<nom>" de type "<type>" et de statut "<statut>" est visible dans la liste
+When  l'utilisateur clique sur l'icône de modification de ce salaire
+And   l'utilisateur efface le montant actuel et saisit "<nouveau_montant>"
+And   l'utilisateur clique sur le bouton "Modifier"
 
-    When je clique sur l'icône de modification
+Then  un message de succès "Salaire modifié" est affiché
+And l'utilisateur ferme le popup de succès
 
-    Then la page de modification du salaire s'ouvre
 
-    Examples:
-      | type      | statut   |
-      | Permanent | En cours |
-  
+Examples:
+  | nom             | type      | statut   | nouveau_montant  |
+  | Harhouri Marwa  | Permanent | En cours | 3000.00          |

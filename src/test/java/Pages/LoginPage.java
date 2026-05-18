@@ -1,11 +1,13 @@
 package Pages;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.junit.Assert;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import Helper.Config;
@@ -46,11 +48,33 @@ public class LoginPage {
         
         loginButton.click();
     }
+/*
+    public void cliqueroption(String option) {
 
-  
+        WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(15));
+
+        WebElement choix = wait.until(
+            ExpectedConditions.elementToBeClickable(
+                By.xpath("//*[contains(text(),'" + option + "')]")
+            )
+        );
+
+        choix.click();
+
+        System.out.println("✅ Option cliquée : " + option);
+    }
+    */
+    
+    
     public void cliqueroption(String nomOption) {
-    	Config.attente(10);
+    	//Config.attente(10);
     	
+        WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(15));
+        
+		 wait.until(
+			ExpectedConditions.visibilityOfAllElements(options)
+		);
+
     	for(WebElement option:options ) {
     		
     		if(option.getText().trim().equalsIgnoreCase(nomOption.trim())) {

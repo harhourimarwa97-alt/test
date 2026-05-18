@@ -1,182 +1,220 @@
 package Pages;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import Helper.Config;
 
 public class Modifier {
 
-    // =========================================================
-    //   XPATH — tous les sélecteurs regroupés ici
-    // =========================================================
+    // ================= TABLE =================
 
-    @FindBy(xpath = "//tbody[contains(@class,'MuiTableBody-root')]//tr[contains(@class,'MuiTableRow-root')]")
-    List<WebElement> lignes;
+    @FindBy(xpath = "//table//tbody//tr")
+    List<WebElement> lignesTableau;
 
-    @FindBy(xpath = "//tbody[contains(@class,'MuiTableBody-root')]//tr[contains(@class,'MuiTableRow-root')]//button[@aria-label='Modifier']")
-    List<WebElement> boutonsModifier;
+    // ================= MODALE =================
 
-    @FindBy(xpath = "//div[contains(@class,'MuiDialog-paper')]")
-    WebElement popUpModifier;
+    @FindBy(xpath = "//h2[contains(text(),'Modifier le salaire')]")
+    WebElement titreModale;
 
-    @FindBy(xpath = "//div[contains(@class,'MuiDialog-paper')]//*[contains(normalize-space(),'Modifier le salaire')]")
-    WebElement titrepopUpModifier;
-    
-    @FindBy(xpath="//div//div//div[@class='MuiBox-root css-13ktxfw']")
-    WebElement champNomETPrenom;
-    
-    /*
-    @FindBy(xpath = "//div[contains(@class,'MuiDialog-paper')]//select[contains(@name,'nom')] | //div[contains(@class,'MuiDialog-paper')]//*[contains(@id,'nom')]")
-    WebElement champNom;*/
-
-    @FindBy(xpath = "//div[contains(@class,'MuiDialog-paper')]//select[contains(@name,'statut')] | //div[contains(@class,'MuiDialog-paper')]//*[contains(@id,'statut')]")
-    WebElement champStatut;
-
-    @FindBy(xpath = "//div[contains(@class,'MuiDialog-paper')]//select[contains(@name,'type')] | //div[contains(@class,'MuiDialog-paper')]//*[contains(@id,'type')]")
-    WebElement champType;
-
-    @FindBy(xpath = "//div[contains(@class,'MuiDialog-paper')]//input[@type='date']")
-    WebElement champDate;
-
-    @FindBy(xpath = "//div[contains(@class,'MuiDialog-paper')]//*[contains(@name,'salaire') or contains(@id,'salaire')]")
+    @FindBy(xpath = "//label[contains(text(),'salaire brute')]//following-sibling::div//input")
     WebElement champSalaire;
 
-    @FindBy(xpath = "//div[contains(@class,'MuiDialog-paper')]//*[contains(@name,'frais') or contains(@id,'frais')]")
-    WebElement champFrais;
-
-    @FindBy(xpath = "//div[contains(@class,'MuiDialog-paper')]//button[contains(normalize-space(),'ANNULER') or contains(normalize-space(),'Annuler')]")
+    @FindBy(xpath = "//button[normalize-space()='ANNULER']")
     WebElement boutonAnnuler;
 
-    @FindBy(xpath = "//div[contains(@class,'MuiDialog-paper')]//button[contains(normalize-space(),'MODIFIER') or contains(normalize-space(),'Modifier')]")
+    @FindBy(xpath = "//button[@class='MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall css-1lclcs2']")
     WebElement boutonModifier;
+    
+    // //div[@id='swal2-html-container']
+    // //*[contains(text(),'Salaire modifié')]
+    
+    @FindBy(xpath = "//div[contains(@role,'dialog')]//*[contains(text(),'Salaire modifié')]")
+    WebElement messageSucces;
+    
+    @FindBy(xpath = "//button[@class='swal2-confirm swal2-styled']")
+    WebElement boutonOk;
 
-  
     public Modifier() {
         PageFactory.initElements(Config.driver, this);
     }
 
-    /**
-     * Parcourt les lignes du tableau et cherche la première ligne
-     * dont TYPE = {type} ET STATUT = {statut}.
-     * Utilisé par le step : "je cherche une ligne avec le type "<type>" et le statut "<statut>""
-     */
+    // ================= UTIL =================
+
+    private String normalize(String value) {
+        return value == null ? "" :
+                value.replace("\u00A0", " ")
+                     .trim()
+                     .toLowerCase();
+    }
+
+    private double parseAmount(String value) {
+        return Double.parseDouble(value.replaceAll("[^0-9.]", ""));
+    }
+
+    private void waitTable() {
+        WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.visibilityOfAllElements(lignesTableau));
+    }
+
+    // ================= LOGIQUE TABLE =================
+
     public boolean chercherLigne(String type, String statut) {
 
-        Config.attente(5);
+        waitTable();
 
-        // Récupérer toutes les lignes du tableau
-        List<WebElement> toutesLesLignes = Config.driver.findElements(
-            By.xpath("//tbody[contains(@class,'MuiTableBody-root')]//tr[contains(@class,'MuiTableRow-root')]")
-        );
+        for (WebElement ligne : lignesTableau) {
 
-        // Parcourir chaque ligne
-        for (int i = 0; i < toutesLesLignes.size(); i++) {
+            String typeCell = ligne.findElement(By.xpath("./td[2]")).getText();
+            String statutCell = ligne.findElement(By.xpath("./td[3]")).getText();
 
-            WebElement ligne = toutesLesLignes.get(i);
+            if (normalize(typeCell).equals(normalize(type)) &&
+                normalize(statutCell).equals(normalize(statut))) {
 
-            // Lire la colonne TYPE (col 2) et STATUT (col 3)
-            String typeCell   = ligne.findElement(By.xpath("./td[2]")).getText().trim();
-            String statutCell = ligne.findElement(By.xpath("./td[3]")).getText().trim();
-
-            System.out.println("Ligne " + i + " → TYPE: '" + typeCell + "' | STATUT: '" + statutCell + "'");
-
-            // Vérifier si la ligne correspond aux paramètres du Scenario Outline
-            if (typeCell.equalsIgnoreCase(type) && statutCell.equalsIgnoreCase(statut)) {
-
-                System.out.println("✅ Ligne trouvée à l'index " + i
-                    + " → TYPE='" + type + "' | STATUT='" + statut + "'");
-
-                return true; // ligne trouvée
+                System.out.println("✅ Ligne trouvée → TYPE=" + type + " | STATUT=" + statut);
+                return true;
             }
         }
 
-        System.out.println("❌ Aucune ligne avec TYPE='" + type + "' et STATUT='" + statut + "' trouvée.");
-        return false; // ligne non trouvée
+        System.out.println("❌ Ligne introuvable → TYPE=" + type + " | STATUT=" + statut);
+        return false;
     }
 
-   
-    public boolean iconeModificationVisible(String type, String statut) {
+    public void cliquerIconeModification(String type, String statut) {
 
-        Config.attente(3);
+        waitTable();
 
-        List<WebElement> toutesLesLignes = Config.driver.findElements(
-            By.xpath("//tbody[contains(@class,'MuiTableBody-root')]//tr[contains(@class,'MuiTableRow-root')]")
+        for (WebElement ligne : lignesTableau) {
+
+            String typeCell = ligne.findElement(By.xpath("./td[2]")).getText();
+            String statutCell = ligne.findElement(By.xpath("./td[3]")).getText();
+
+            if (normalize(typeCell).equals(normalize(type)) &&
+                normalize(statutCell).equals(normalize(statut))) {
+
+                ligne.findElement(By.xpath("./td[5]//button[1]")).click();
+
+                System.out.println("✅ Icône modification cliquée");
+                return;
+            }
+        }
+
+        throw new RuntimeException("❌ Aucune ligne trouvée pour modification");
+    }
+    
+    public void saisirNouveauMontant(String montant) {
+
+        WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(10));
+
+        WebElement input = wait.until(
+            ExpectedConditions.elementToBeClickable(champSalaire)
         );
 
-        List<WebElement> boutons = Config.driver.findElements(
-            By.xpath("//tbody[contains(@class,'MuiTableBody-root')]//tr[contains(@class,'MuiTableRow-root')]//button[@aria-label='Modifier']")
+        input.click();
+
+        // Sélectionner tout le texte
+        input.sendKeys(Keys.CONTROL + "a");
+
+        // Supprimer ancienne valeur
+        input.sendKeys(Keys.DELETE);
+
+        // Saisir nouveau montant
+        input.sendKeys(montant);
+
+        System.out.println("✅ Nouveau montant saisi : " + montant);
+    }
+
+/*
+    public void saisirNouveauMontant(String montant) {
+        champSalaire.clear();
+        champSalaire.sendKeys(montant);
+        System.out.println("✅ Montant saisi : " + montant);
+    }
+*/
+    public void soumettreFormulaire() {
+
+        WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(10));
+
+        WebElement bouton = wait.until(
+            ExpectedConditions.elementToBeClickable(boutonModifier)
         );
 
-        for (int i = 0; i < toutesLesLignes.size(); i++) {
+        bouton.click();
 
-            WebElement ligne      = toutesLesLignes.get(i);
-            String typeCell       = ligne.findElement(By.xpath("./td[2]")).getText().trim();
-            String statutCell     = ligne.findElement(By.xpath("./td[3]")).getText().trim();
+        System.out.println("✅ Bouton MODIFIER cliqué");
+    } 
+    /*
+    public void soumettreFormulaire() {
+    	Config.attente(10);
+        boutonModifier.click();
+        System.out.println("✅ Bouton MODIFIER cliqué");
+    }
+    */
+    
+    public boolean messageSuccesAffiche() {
 
-            if (typeCell.equalsIgnoreCase(type) && statutCell.equalsIgnoreCase(statut)) {
+        WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(10));
 
-                return boutons.get(i).isDisplayed();
+        WebElement msg = wait.until(
+            ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//div[contains(@role,'dialog')]//*[contains(text(),'Salaire modifié')]")
+            )
+        );
+
+        return msg.isDisplayed();
+    }
+
+  /*  public boolean messageSuccesAffiche() {
+        return messageSucces.isDisplayed();
+    }
+*/
+    // ================= VERIFICATION =================
+/*
+    public boolean verifierMontantMisAJour(String type, String statut, String montantAttendu) {
+
+        waitTable();
+
+        for (WebElement ligne : lignesTableau) {
+
+            String typeCell = ligne.findElement(By.xpath("./td[2]")).getText();
+            String statutCell = ligne.findElement(By.xpath("./td[3]")).getText();
+
+            if (normalize(typeCell).equals(normalize(type)) &&
+                normalize(statutCell).equals(normalize(statut))) {
+
+                String montantAffiche = ligne.findElement(By.xpath("./td[4]")).getText();
+
+                double actual = parseAmount(montantAffiche);
+                double expected = parseAmount(montantAttendu);
+
+                System.out.println("Montant UI=" + actual + " | attendu=" + expected);
+
+                return actual == expected;
             }
         }
 
         return false;
     }
+*/
+    // ================= MODALE CHECK =================
 
-   
-     // Clique icône de modification de ligne  avec TYPE = {type} ET STATUT = {statut}.
-    
-    public void cliquerIconeModification(String type, String statut) {
-
-        Config.attente(3);
-
-        List<WebElement> toutesLesLignes = Config.driver.findElements(
-            By.xpath("//tbody[contains(@class,'MuiTableBody-root')]//tr[contains(@class,'MuiTableRow-root')]")
-        );
-
-        List<WebElement> boutons = Config.driver.findElements(
-            By.xpath("//tbody[contains(@class,'MuiTableBody-root')]//tr[contains(@class,'MuiTableRow-root')]//button[@aria-label='Modifier']")
-        );
-
-        for (int i = 0; i < toutesLesLignes.size(); i++) {
-
-            WebElement ligne  = toutesLesLignes.get(i);
-            String typeCell   = ligne.findElement(By.xpath("./td[2]")).getText().trim();
-            String statutCell = ligne.findElement(By.xpath("./td[3]")).getText().trim();
-
-            if (typeCell.equalsIgnoreCase(type) && statutCell.equalsIgnoreCase(statut)) {
-
-                boutons.get(i).click();
-
-                System.out.println("✅ Cliqué sur l'icône de modification → TYPE='"
-                    + type + "' | STATUT='" + statut + "'");
-                return;
-            }
-        }
-
-        throw new RuntimeException(
-            "❌ Impossible de cliquer : aucune ligne avec TYPE='"
-            + type + "' et STATUT='" + statut + "' trouvée."
-        );
-    }
-
-  
-    public boolean verifier() {
-
-        Config.attente(5);
-
-        return titrepopUpModifier.isDisplayed()
-            && champNomETPrenom.isDisplayed()
-            && champStatut.isDisplayed()
-            && champType.isDisplayed()
-            && champDate.isDisplayed()
+    public boolean verifierModaleOuverte() {
+        return titreModale.isDisplayed()
             && champSalaire.isDisplayed()
-            && champFrais.isDisplayed()
-            && boutonAnnuler.isDisplayed()
-            && boutonModifier.isDisplayed();
+            && boutonModifier.isDisplayed()
+            && boutonAnnuler.isDisplayed();
+    }
+    
+    public void fermerPopupSucces() {
+        boutonOk.click();
+        System.out.println("✅ Popup fermé (OK cliqué)");
     }
 }

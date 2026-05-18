@@ -2,6 +2,7 @@ package StepDefErudaxis;
 
 import java.time.Duration;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -26,6 +27,52 @@ public class CommunStepDef {
         loginPage.connect(email, password);
         
     }
+    
+    
+    /*
+    @Given("utilisateur choisit l option  {string}")
+    public void utilisateur_choisit_l_option(String option) {
+
+        LoginPage loginPage = new LoginPage();
+
+        // Cliquer sur l'option
+        loginPage.cliqueroption(option);
+
+        // Wait intelligent
+        WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(30));
+
+        // Attendre que le menu Administration soit visible
+        wait.until(ExpectedConditions.visibilityOfElementLocated(
+            By.xpath("//*[contains(text(),'Administration')]")
+        ));
+
+        // Debug utile
+        System.out.println("✅ Redirection réussie");
+        System.out.println("URL actuelle : " + Config.driver.getCurrentUrl());
+    }
+    
+    */
+    
+    @Given("utilisateur choisit l option  {string}")
+    public void utilisateur_choisit_l_option(String option) {
+
+        LoginPage loginPage = new LoginPage();
+
+        // Cliquer sur l'option
+        loginPage.cliqueroption(option);
+
+        // Wait intelligent
+        WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(30));
+
+        // Attendre qu'un élément du dashboard apparaisse
+        wait.until(ExpectedConditions.visibilityOfElementLocated(
+            By.xpath("//*[contains(text(),'Administration')]")
+        ));
+
+        System.out.println("✅ Option sélectionnée : " + option);
+        System.out.println("✅ URL actuelle : " + Config.driver.getCurrentUrl());
+    }
+  /*
  
     // ✅  utilisateur choisit l'option
     
@@ -44,5 +91,5 @@ public class CommunStepDef {
             try { Thread.sleep(5000); } catch (Exception e) {}
         }
         
-        
+       */ 
     }
