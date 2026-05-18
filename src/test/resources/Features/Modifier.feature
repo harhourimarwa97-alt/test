@@ -11,16 +11,18 @@ Background:
     And   utilisateur clique sur le sous-sous-sous-menu "Salaires"
     
 
-Scenario: Modifier  un salaire permanent
-  Given je suis sur la page de consultation des salaires
+ Scenario Outline: Modifier un salaire permanent
+    Given je suis sur la page de consultation des salaires
 
-  When je cherche une ligne avec le type "Permanent"
+    When je cherche une ligne avec le type "<type>" et le statut "<statut>"
 
-  Then l’icone de modification est visible
+    Then l'icône de modification est visible
 
-  When je clique sur l’icone de modification
+    When je clique sur l'icône de modification
 
-  Then la page de modification du salaire s’ouvre
-  
-  
+    Then la page de modification du salaire s'ouvre
+
+    Examples:
+      | type      | statut   |
+      | Permanent | En cours |
   
