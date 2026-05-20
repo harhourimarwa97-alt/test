@@ -15,12 +15,8 @@ import Helper.Config;
 
 public class Modifier {
 
-    // ================= TABLE =================
-
     @FindBy(xpath = "//table//tbody//tr")
     List<WebElement> lignesTableau;
-
-    // ================= MODALE =================
 
     @FindBy(xpath = "//h2[contains(text(),'Modifier le salaire')]")
     WebElement titreModale;
@@ -33,15 +29,24 @@ public class Modifier {
 
     @FindBy(xpath = "//button[@class='MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall css-1lclcs2']")
     WebElement boutonModifier;
-    
-    // //div[@id='swal2-html-container']
-    // //*[contains(text(),'Salaire modifié')]
-    
+
     @FindBy(xpath = "//div[contains(@role,'dialog')]//*[contains(text(),'Salaire modifié')]")
     WebElement messageSucces;
-    
+
     @FindBy(xpath = "//button[@class='swal2-confirm swal2-styled']")
     WebElement boutonOk;
+
+    @FindBy(xpath="//button[@class='MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeSmall MuiButton-outlinedSizeSmall MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeSmall MuiButton-outlinedSizeSmall css-1d9alwg']")
+    WebElement bouton_ANNULER;
+
+    // =================  SCENARIO 2 : message erreur =================
+
+    @FindBy(xpath = "//div[contains(@role,'dialog')]//*[contains(text(),'Montant trop élevé')]")
+    WebElement messageErreur;
+
+    @FindBy(xpath = "//button[@class='swal2-confirm swal2-styled']")
+    WebElement boutonOkErreur;
+
 
     public Modifier() {
         PageFactory.initElements(Config.driver, this);
@@ -73,7 +78,7 @@ public class Modifier {
 
         for (WebElement ligne : lignesTableau) {
 
-            String typeCell = ligne.findElement(By.xpath("./td[2]")).getText();
+            String typeCell   = ligne.findElement(By.xpath("./td[2]")).getText();
             String statutCell = ligne.findElement(By.xpath("./td[3]")).getText();
 
             if (normalize(typeCell).equals(normalize(type)) &&
@@ -94,7 +99,7 @@ public class Modifier {
 
         for (WebElement ligne : lignesTableau) {
 
-            String typeCell = ligne.findElement(By.xpath("./td[2]")).getText();
+            String typeCell   = ligne.findElement(By.xpath("./td[2]")).getText();
             String statutCell = ligne.findElement(By.xpath("./td[3]")).getText();
 
             if (normalize(typeCell).equals(normalize(type)) &&
@@ -109,7 +114,7 @@ public class Modifier {
 
         throw new RuntimeException("❌ Aucune ligne trouvée pour modification");
     }
-    
+
     public void saisirNouveauMontant(String montant) {
 
         WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(10));
@@ -119,26 +124,13 @@ public class Modifier {
         );
 
         input.click();
-
-        // Sélectionner tout le texte
         input.sendKeys(Keys.CONTROL + "a");
-
-        // Supprimer ancienne valeur
         input.sendKeys(Keys.DELETE);
-
-        // Saisir nouveau montant
         input.sendKeys(montant);
 
         System.out.println("✅ Nouveau montant saisi : " + montant);
     }
 
-/*
-    public void saisirNouveauMontant(String montant) {
-        champSalaire.clear();
-        champSalaire.sendKeys(montant);
-        System.out.println("✅ Montant saisi : " + montant);
-    }
-*/
     public void soumettreFormulaire() {
 
         WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(10));
@@ -150,15 +142,18 @@ public class Modifier {
         bouton.click();
 
         System.out.println("✅ Bouton MODIFIER cliqué");
-    } 
-    /*
-    public void soumettreFormulaire() {
-    	Config.attente(10);
-        boutonModifier.click();
-        System.out.println("✅ Bouton MODIFIER cliqué");
     }
-    */
-    
+
+    public void annulerFormulaire() {
+
+        WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(10));
+
+        WebElement bouton = wait.until(ExpectedConditions.elementToBeClickable(bouton_ANNULER));
+        bouton.click();
+
+        System.out.println("✅ Bouton ANNULER cliqué");
+    }
+
     public boolean messageSuccesAffiche() {
 
         WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(10));
@@ -172,38 +167,92 @@ public class Modifier {
         return msg.isDisplayed();
     }
 
-  /*  public boolean messageSuccesAffiche() {
-        return messageSucces.isDisplayed();
+    public void fermerPopupSucces() {
+        boutonOk.click();
+        System.out.println("✅ Popup succès fermé (OK cliqué)");
     }
-*/
-    // ================= VERIFICATION =================
-/*
-    public boolean verifierMontantMisAJour(String type, String statut, String montantAttendu) {
+
+    // ================= AJOUT SCENARIO 2 : montant trop élevé =================
+
+    /**
+     * Vérifie que le message "Montant trop élevé" est affiché.
+     */
+    public boolean messageErreurAffiche() {
+
+        WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(10));
+
+        WebElement msg = wait.until(
+            ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//div[contains(@role,'dialog')]//*[contains(text(),'Montant trop élevé')]")
+            )
+        );
+
+        System.out.println("✅ Message d'erreur affiché : Montant trop élevé");
+        return msg.isDisplayed();
+    }
+
+    /**
+     * Ferme le popup d'erreur en cliquant sur OK.
+     */
+    public void fermerPopupErreur() {
+
+        WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(10));
+
+        WebElement bouton = wait.until(
+            ExpectedConditions.elementToBeClickable(boutonOkErreur)
+        );
+        bouton.click();
+
+        System.out.println("✅ Popup erreur fermé (OK cliqué)");
+    }
+
+    // ================= AJOUT SCENARIO 3 : bouton Annuler =================
+
+    /**
+     * Récupère le montant actuel affiché dans la ligne selon type et statut.
+     * Utilisé pour comparer avant/après dans le scénario Annuler.
+     */
+    public String getMontantActuel(String type, String statut) {
 
         waitTable();
 
         for (WebElement ligne : lignesTableau) {
 
-            String typeCell = ligne.findElement(By.xpath("./td[2]")).getText();
+            String typeCell   = ligne.findElement(By.xpath("./td[2]")).getText();
             String statutCell = ligne.findElement(By.xpath("./td[3]")).getText();
 
             if (normalize(typeCell).equals(normalize(type)) &&
                 normalize(statutCell).equals(normalize(statut))) {
 
-                String montantAffiche = ligne.findElement(By.xpath("./td[4]")).getText();
-
-                double actual = parseAmount(montantAffiche);
-                double expected = parseAmount(montantAttendu);
-
-                System.out.println("Montant UI=" + actual + " | attendu=" + expected);
-
-                return actual == expected;
+                String montant = ligne.findElement(By.xpath("./td[4]")).getText();
+                System.out.println("✅ Montant actuel récupéré : " + montant);
+                return montant.trim();
             }
         }
 
-        return false;
+        System.out.println("❌ Montant introuvable pour TYPE=" + type + " | STATUT=" + statut);
+        return "";
     }
-*/
+
+    /**
+     * Vérifie que la liste des salaires est bien affichée.
+     * Utilisé après un clic sur Annuler pour confirmer le retour à la liste.
+     */
+    public boolean listeDesSalairesAffichee() {
+
+        WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(10));
+
+        try {
+            wait.until(ExpectedConditions.visibilityOfAllElements(lignesTableau));
+            System.out.println("✅ Liste des salaires affichée");
+            return true;
+
+        } catch (Exception e) {
+            System.out.println("❌ Liste des salaires non affichée");
+            return false;
+        }
+    }
+
     // ================= MODALE CHECK =================
 
     public boolean verifierModaleOuverte() {
@@ -211,10 +260,5 @@ public class Modifier {
             && champSalaire.isDisplayed()
             && boutonModifier.isDisplayed()
             && boutonAnnuler.isDisplayed();
-    }
-    
-    public void fermerPopupSucces() {
-        boutonOk.click();
-        System.out.println("✅ Popup fermé (OK cliqué)");
     }
 }

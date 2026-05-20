@@ -12,7 +12,8 @@ import io.cucumber.junit.CucumberOptions;
 		glue="StepDefErudaxis",
 		plugin = {"pretty",
 				  "html:target/cucumber/report.html",
-				 "json:target/cucumber/report.json"
+				 "json:target/cucumber/report.json" ,
+				 
 				 }
 		
 		
