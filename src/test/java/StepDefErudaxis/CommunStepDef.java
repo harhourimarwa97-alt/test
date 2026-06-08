@@ -3,7 +3,6 @@ package StepDefErudaxis;
 import java.time.Duration;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -15,8 +14,7 @@ public class CommunStepDef {
 
     @Given("utilisateur est sur la page d'accueil")
     public void utilisateur_est_sur_la_page_d_accueil() {
-        Config.driver = new ChromeDriver();
-        Config.maximizewindow();
+        Config.confChrome();
         Config.driver.get("https://staging.erudaxis.com/login");
     }
 
