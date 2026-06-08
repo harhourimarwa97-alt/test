@@ -1,5 +1,5 @@
 Feature: Authentification utilisateur
-
+@login
 Scenario: Connexion réussie avec des identifiants valides
 
 Given utilisateur est sur la page de connexion
