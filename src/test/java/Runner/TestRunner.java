@@ -8,7 +8,7 @@ import io.cucumber.junit.CucumberOptions;
 @CucumberOptions(
     features = "src/test/resources/Features",
     glue = "StepDefErudaxis",
-    tags = "@login",
+    tags = "",
     plugin = {
         "pretty",
         "html:target/cucumber-reports/cucumber.html",
