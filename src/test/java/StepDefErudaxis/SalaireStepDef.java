@@ -51,9 +51,20 @@ public class SalaireStepDef {
         salairePage.saisirFrais(frais);
     }
 
+    // @Then("le salaire est ajouté avec succès")
+    // public void le_salaire_est_ajoute_avec_succes() {
+    //     Assert.assertTrue(salairePage.salaireAjouteAvecSucces());
+    //     Config.driver.quit();
+    // }
     @Then("le salaire est ajouté avec succès")
     public void le_salaire_est_ajoute_avec_succes() {
-        Assert.assertTrue(salairePage.salaireAjouteAvecSucces());
-        Config.driver.quit();
-    }
+
+      boolean success =
+            Config.driver.getPageSource().contains("Salaire ajouté")
+            || Config.driver.getPageSource().contains("Succès Salaire ajouté");
+
+      Assert.assertTrue("Message de succès non affiché", success);
+ 
+      Config.driver.quit();
+       }
 }
