@@ -13,7 +13,9 @@ public class LoginPageStepDef {
     @Given("utilisateur est sur la page de connexion")
     public void utilisateur_est_sur_la_page_de_connexion() throws Exception{
     	//Config.driver = new ChromeDriver();
-        ChromeOptions options = new ChromeOptions();
+        Config.confChrome();
+        Config.maximizewindow();
+   /*     ChromeOptions options = new ChromeOptions();
 
         options.addArguments("--headless=new");
         options.addArguments("--no-sandbox");
@@ -22,7 +24,7 @@ public class LoginPageStepDef {
         options.addArguments("--window-size=1920,1080");
 
 Config.driver = new ChromeDriver(options);
-        Config.driver.manage().window().maximize();
+        Config.driver.manage().window().maximize(); */
 
         Config.driver.get(Utils.getProperty("Erudaxis_link"));
 
