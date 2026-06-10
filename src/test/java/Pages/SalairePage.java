@@ -14,24 +14,21 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import Helper.Config;
 
 public class SalairePage {
- 
+
     @FindBy(xpath = "//button[text()='+Ajouter un Salaire']")
     WebElement btnAjouter;
-  
+
     @FindBy(xpath = "//input[@placeholder='Nom & Prénom']")
-    WebElement inputNom; 
- 
- // 1. Bouton flèche → pour OUVRIR la liste
+    WebElement inputNom;
+
     @FindBy(xpath = "(//*[@data-testid='ArrowDropDownIcon']/..)[2]")
     WebElement btnArrowStatut;
 
-    // 2. Options → pour TROUVER les options après ouverture
     private static final By XPATH_OPTIONS_STATUT =
-        By.xpath("//ul[@role='listbox']/li");
+            By.xpath("//ul[@role='listbox']/li");
 
-  
     @FindBy(xpath = "//input[@name='dateEmbauche']")
-    WebElement Date; 
+    WebElement Date;
 
     @FindBy(xpath = "//input[@placeholder='Salaire brute']")
     WebElement Salaire;
@@ -42,17 +39,9 @@ public class SalairePage {
     @FindBy(xpath = "//button[text()='Ajouter']")
     WebElement btnAjouterPopup;
 
-    
- /*   private static final By XPATH_OPTIONS_NOM =
-    	    By.xpath("//ul[@role='listbox']/li[@role='option']");
-    
-    */
-    
     private static final By XPATH_OPTIONS_NOM =
-    	    By.xpath("//ul[@role='listbox']//li[contains(@class,'MuiAutocomplete-option')]");
-    
+            By.xpath("//ul[@role='listbox']//li[contains(@class,'MuiAutocomplete-option')]");
 
-  
     private WebDriverWait wait;
     private Actions actions;
 
@@ -62,36 +51,32 @@ public class SalairePage {
         actions = new Actions(Config.driver);
     }
 
-   
-
+    // =========================
+    // OUVRIR FORMULAIRE
+    // =========================
     public void cliquerbtnAjouter() {
         wait.until(ExpectedConditions.elementToBeClickable(btnAjouter));
         actions.moveToElement(btnAjouter).click().perform();
     }
-    
-  
+
+    // =========================
+    // NOM
+    // =========================
     public void choisirNom(String nom) {
         wait.until(ExpectedConditions.elementToBeClickable(inputNom));
-        
-        // 1. Cliquer pour focus
+
         inputNom.click();
-        
-        // 2. Vider et taper le nom
         inputNom.clear();
         inputNom.sendKeys(nom);
 
-        // 3. Attendre que la dropdown soit VRAIMENT ouverte
         wait.until(ExpectedConditions.attributeToBe(inputNom, "aria-expanded", "true"));
 
-        // 4. Chercher les options
         List<WebElement> options = wait.until(
-            ExpectedConditions.visibilityOfAllElementsLocatedBy(XPATH_OPTIONS_NOM)
+                ExpectedConditions.visibilityOfAllElementsLocatedBy(XPATH_OPTIONS_NOM)
         );
 
         for (WebElement option : options) {
-            String optionText = option.getText().trim()
-                                      .replaceAll("[\\n\\r]+", " ")
-                                      .replaceAll("\\s+", " ");
+            String optionText = option.getText().trim().replaceAll("\\s+", " ");
             String nomCherche = nom.trim().replaceAll("\\s+", " ");
 
             if (optionText.equalsIgnoreCase(nomCherche)) {
@@ -102,30 +87,23 @@ public class SalairePage {
 
         throw new RuntimeException("Nom non trouvé : " + nom);
     }
-    
-  
+
+    // =========================
+    // STATUT
+    // =========================
     public void choisirStatut(String statut) {
-        //  Clique sur le bouton flèche pour ouvrir la liste
+
         wait.until(ExpectedConditions.elementToBeClickable(btnArrowStatut));
         btnArrowStatut.click();
-        
-        
-        
+
         wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(XPATH_OPTIONS_STATUT, 0));
 
-        //  Cherche les options
         List<WebElement> options = Config.driver.findElements(XPATH_OPTIONS_STATUT);
 
-        System.out.println("=== STATUT OPTIONS ===");
-        System.out.println("Nombre : " + options.size());
-        for (WebElement o : options) {
-            System.out.println("Option : '" + o.getText().trim() + "'");
-        }
-
-        // Clique sur le bon statut
         for (WebElement option : options) {
             String optionText = option.getText().trim().replaceAll("\\s+", " ");
             String statutCherche = statut.trim().replaceAll("\\s+", " ");
+
             if (optionText.equalsIgnoreCase(statutCherche)) {
                 option.click();
                 return;
@@ -140,12 +118,12 @@ public class SalairePage {
         throw new RuntimeException("Statut non trouvé : " + statut);
     }
 
-
+    // =========================
+    // INPUTS
+    // =========================
     public void saisirDate(String date) {
-    	
-    	WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(15));
         wait.until(ExpectedConditions.visibilityOf(Date));
-        Date.sendKeys(date); 
+        Date.sendKeys(date);
     }
 
     public void saisirSalaire(String salaire) {
@@ -158,13 +136,25 @@ public class SalairePage {
         Frais.sendKeys(frais);
     }
 
+    // =========================
+    // SUBMIT POPUP
+    // =========================
     public void cliquerbtnAjouterPopup() {
         wait.until(ExpectedConditions.elementToBeClickable(btnAjouterPopup));
-        actions.moveToElement(btnAjouterPopup).click().perform();
+        btnAjouterPopup.click();
     }
 
+    // =========================
+    // ✅ VALIDATION AJOUT CORRIGÉE
+    // =========================
     public boolean salaireAjouteAvecSucces() {
-        wait.until(ExpectedConditions.invisibilityOf(btnAjouterPopup));
+
+        By toastSuccess = By.xpath(
+                "//*[contains(text(),'succès') or contains(text(),'ajouté') or contains(text(),'success')]"
+        );
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(toastSuccess));
+
         return true;
     }
 }
