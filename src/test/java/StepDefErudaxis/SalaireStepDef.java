@@ -51,34 +51,34 @@ public class SalaireStepDef {
         salairePage.saisirFrais(frais);
     }
 
-    // @Then("le salaire est ajouté avec succès")
-    // public void le_salaire_est_ajoute_avec_succes() {
-    //     Assert.assertTrue(salairePage.salaireAjouteAvecSucces());
-    //     Config.driver.quit();
-    // }
+    @Then("le salaire est ajouté avec succès")
+    public void le_salaire_est_ajoute_avec_succes() {
+        Assert.assertTrue(salairePage.salaireAjouteAvecSucces());
+        Config.driver.quit();
+    }
    
-@Then("le salaire est ajouté avec succès")
-public void le_salaire_est_ajoute_avec_succes() {
+// @Then("le salaire est ajouté avec succès")
+// public void le_salaire_est_ajoute_avec_succes() {
 
-    WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(15));
+//     WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(15));
 
-    By title = By.cssSelector(".swal2-title");
-    By message = By.cssSelector(".swal2-html-container");
+//     By title = By.cssSelector(".swal2-title");
+//     By message = By.cssSelector(".swal2-html-container");
 
-    // Attendre apparition popup
-    wait.until(ExpectedConditions.visibilityOfElementLocated(title));
-    wait.until(ExpectedConditions.visibilityOfElementLocated(message));
+//     // Attendre apparition popup
+//     wait.until(ExpectedConditions.visibilityOfElementLocated(title));
+//     wait.until(ExpectedConditions.visibilityOfElementLocated(message));
 
-    // Récupérer texte
-    String titleText = Config.driver.findElement(title).getText().trim();
-    String messageText = Config.driver.findElement(message).getText().trim();
+//     // Récupérer texte
+//     String titleText = Config.driver.findElement(title).getText().trim();
+//     String messageText = Config.driver.findElement(message).getText().trim();
 
-    // Vérifications strictes
-    Assert.assertTrue(titleText.equals("Succès"));
-    Assert.assertTrue(
-        messageText.equals("Salaire ajouté.") || messageText.equals("Salaire ajouté")
-    );
+//     // Vérifications strictes
+//     Assert.assertTrue(titleText.equals("Succès"));
+//     Assert.assertTrue(
+//         messageText.equals("Salaire ajouté.") || messageText.equals("Salaire ajouté")
+//     );
 
-    Config.driver.quit();
-}
+//     Config.driver.quit();
+// }
 }
