@@ -56,15 +56,29 @@ public class SalaireStepDef {
     //     Assert.assertTrue(salairePage.salaireAjouteAvecSucces());
     //     Config.driver.quit();
     // }
-    @Then("le salaire est ajouté avec succès")
-    public void le_salaire_est_ajoute_avec_succes() {
+   
+@Then("le salaire est ajouté avec succès")
+public void le_salaire_est_ajoute_avec_succes() {
 
-      boolean success =
-            Config.driver.getPageSource().contains("Salaire ajouté")
-            || Config.driver.getPageSource().contains("Succès Salaire ajouté");
+    WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(15));
 
-      Assert.assertTrue("Message de succès non affiché", success);
- 
-      Config.driver.quit();
-       }
+    By title = By.cssSelector(".swal2-title");
+    By message = By.cssSelector(".swal2-html-container");
+
+    // Attendre apparition popup
+    wait.until(ExpectedConditions.visibilityOfElementLocated(title));
+    wait.until(ExpectedConditions.visibilityOfElementLocated(message));
+
+    // Récupérer texte
+    String titleText = Config.driver.findElement(title).getText().trim();
+    String messageText = Config.driver.findElement(message).getText().trim();
+
+    // Vérifications strictes
+    Assert.assertTrue(titleText.equals("Succès"));
+    Assert.assertTrue(
+        messageText.equals("Salaire ajouté.") || messageText.equals("Salaire ajouté")
+    );
+
+    Config.driver.quit();
+}
 }
