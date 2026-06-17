@@ -9,26 +9,38 @@ import io.cucumber.java.en.When;
 
 public class SalaireStepDef {
 
-    
-    SalairePage salairePage = null;
+    // ✅ CORRECTION : une seule instance de Page Object
+    // Avant : tu recréais SalairePage plusieurs fois (instable)
+    // Maintenant : une seule instance pour tout le scénario
+    SalairePage salairePage = new SalairePage();
 
     @When("utilisateur clique sur le bouton {string}")
     public void utilisateur_clique_sur_le_bouton(String bouton) {
+
         if (bouton.equalsIgnoreCase("Ajouter un salaire")) {
-            // ✅ Crée une première instance pour cliquer sur le bouton
-            salairePage = new SalairePage();
+
+            // action pour ouvrir le formulaire salaire
             salairePage.cliquerbtnAjouter();
-        
-        } else if (bouton.equalsIgnoreCase("Ajouter")) {
+        }
+
+        else if (bouton.equalsIgnoreCase("Ajouter")) {
+
+            // action pour valider le formulaire (popup)
             salairePage.cliquerbtnAjouterPopup();
         }
     }
 
     @And("utilisateur choisit le nom {string}")
     public void utilisateur_choisit_le_nom(String nom) {
+
+        // sélection du nom dans l'autocomplete
         salairePage.choisirNom(nom);
-     // ✅ Réinitialise après que les champs apparaissent
-        salairePage = new SalairePage();
+
+        // ❌ CORRECTION IMPORTANTE :
+        // SUPPRESSION de "salairePage = new SalairePage();"
+        // Pourquoi ?
+        // → ça cassait le contexte du formulaire ouvert
+        // → pouvait provoquer des erreurs Selenium (stale element)
     }
 
     @And("utilisateur choisit le statut {string}")
@@ -53,32 +65,11 @@ public class SalaireStepDef {
 
     @Then("le salaire est ajouté avec succès")
     public void le_salaire_est_ajoute_avec_succes() {
+
+        // assertion basée sur le message de succès (toast / notification UI)
         Assert.assertTrue(salairePage.salaireAjouteAvecSucces());
+
+        // fermeture du navigateur après exécution du test
         Config.driver.quit();
     }
-   
-// @Then("le salaire est ajouté avec succès")
-// public void le_salaire_est_ajoute_avec_succes() {
-
-//     WebDriverWait wait = new WebDriverWait(Config.driver, Duration.ofSeconds(15));
-
-//     By title = By.cssSelector(".swal2-title");
-//     By message = By.cssSelector(".swal2-html-container");
-
-//     // Attendre apparition popup
-//     wait.until(ExpectedConditions.visibilityOfElementLocated(title));
-//     wait.until(ExpectedConditions.visibilityOfElementLocated(message));
-
-//     // Récupérer texte
-//     String titleText = Config.driver.findElement(title).getText().trim();
-//     String messageText = Config.driver.findElement(message).getText().trim();
-
-//     // Vérifications strictes
-//     Assert.assertTrue(titleText.equals("Succès"));
-//     Assert.assertTrue(
-//         messageText.equals("Salaire ajouté.") || messageText.equals("Salaire ajouté")
-//     );
-
-//     Config.driver.quit();
-// }
 }
