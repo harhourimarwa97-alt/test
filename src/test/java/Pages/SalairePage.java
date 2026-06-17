@@ -25,7 +25,7 @@ public class SalairePage {
     WebElement btnArrowStatut;
 
     private static final By XPATH_OPTIONS_STATUT =
-            By.xpath("//ul[@role='listbox']/li");
+        By.xpath("//ul[@role='listbox']/li");
 
     @FindBy(xpath = "//input[@name='dateEmbauche']")
     WebElement Date;
@@ -40,7 +40,11 @@ public class SalairePage {
     WebElement btnAjouterPopup;
 
     private static final By XPATH_OPTIONS_NOM =
-            By.xpath("//ul[@role='listbox']//li[contains(@class,'MuiAutocomplete-option')]");
+        By.xpath("//ul[@role='listbox']//li[contains(@class,'MuiAutocomplete-option')]");
+
+    // ✅ CORRECTION : locator du message de succès
+    private static final By SUCCESS_MSG =
+        By.xpath("//*[contains(.,'succès') or contains(.,'ajouté') or contains(.,'success')]");
 
     private WebDriverWait wait;
     private Actions actions;
@@ -51,17 +55,11 @@ public class SalairePage {
         actions = new Actions(Config.driver);
     }
 
-    // =========================
-    // OUVRIR FORMULAIRE
-    // =========================
     public void cliquerbtnAjouter() {
         wait.until(ExpectedConditions.elementToBeClickable(btnAjouter));
         actions.moveToElement(btnAjouter).click().perform();
     }
 
-    // =========================
-    // NOM
-    // =========================
     public void choisirNom(String nom) {
         wait.until(ExpectedConditions.elementToBeClickable(inputNom));
 
@@ -72,11 +70,14 @@ public class SalairePage {
         wait.until(ExpectedConditions.attributeToBe(inputNom, "aria-expanded", "true"));
 
         List<WebElement> options = wait.until(
-                ExpectedConditions.visibilityOfAllElementsLocatedBy(XPATH_OPTIONS_NOM)
+            ExpectedConditions.visibilityOfAllElementsLocatedBy(XPATH_OPTIONS_NOM)
         );
 
         for (WebElement option : options) {
-            String optionText = option.getText().trim().replaceAll("\\s+", " ");
+            String optionText = option.getText().trim()
+                .replaceAll("[\\n\\r]+", " ")
+                .replaceAll("\\s+", " ");
+
             String nomCherche = nom.trim().replaceAll("\\s+", " ");
 
             if (optionText.equalsIgnoreCase(nomCherche)) {
@@ -88,11 +89,7 @@ public class SalairePage {
         throw new RuntimeException("Nom non trouvé : " + nom);
     }
 
-    // =========================
-    // STATUT
-    // =========================
     public void choisirStatut(String statut) {
-
         wait.until(ExpectedConditions.elementToBeClickable(btnArrowStatut));
         btnArrowStatut.click();
 
@@ -118,9 +115,6 @@ public class SalairePage {
         throw new RuntimeException("Statut non trouvé : " + statut);
     }
 
-    // =========================
-    // INPUTS
-    // =========================
     public void saisirDate(String date) {
         wait.until(ExpectedConditions.visibilityOf(Date));
         Date.sendKeys(date);
@@ -136,25 +130,24 @@ public class SalairePage {
         Frais.sendKeys(frais);
     }
 
-    // =========================
-    // SUBMIT POPUP
-    // =========================
     public void cliquerbtnAjouterPopup() {
         wait.until(ExpectedConditions.elementToBeClickable(btnAjouterPopup));
-        btnAjouterPopup.click();
+        actions.moveToElement(btnAjouterPopup).click().perform();
     }
 
-    // =========================
-    // ✅ VALIDATION AJOUT CORRIGÉE
-    // =========================
+    // ❌ ANCIENNE VERSION (ne garantit pas le succès métier)
+    /*
     public boolean salaireAjouteAvecSucces() {
-
-        By toastSuccess = By.xpath(
-                "//*[contains(text(),'succès') or contains(text(),'ajouté') or contains(text(),'success')]"
-        );
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(toastSuccess));
-
+        wait.until(ExpectedConditions.invisibilityOf(btnAjouterPopup));
         return true;
+    }
+    */
+
+    // ✅ VERSION CORRIGÉE : attend un vrai message de succès dans l'UI
+    public boolean salaireAjouteAvecSucces() {
+        WebElement msg = wait.until(
+            ExpectedConditions.visibilityOfElementLocated(SUCCESS_MSG)
+        );
+        return msg.isDisplayed();
     }
 }
