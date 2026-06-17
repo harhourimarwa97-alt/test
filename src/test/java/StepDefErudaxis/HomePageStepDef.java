@@ -8,6 +8,7 @@ import io.cucumber.java.en.When;
 
 public class HomePageStepDef {
 
+    // ✅ UNE SEULE INSTANCE HOME PAGE
     HomePage homePage = new HomePage();
 
     @When("utilisateur clique sur le menu {string}")
@@ -17,27 +18,24 @@ public class HomePageStepDef {
 
     @When("utilisateur clique sur le sous-menu {string}")
     public void utilisateur_clique_sur_le_sous_menu(String submenu) {
-        homePage = new HomePage();
         homePage.clickOnSubMenu(submenu);
     }
 
     @When("utilisateur clique sur le sous-sous-menu {string}")
     public void utilisateur_clique_sur_le_sous_sous_menu(String subsubmenu) {
-        homePage = new HomePage();
         homePage.clickOnSubSubMenu(subsubmenu);
     }
 
     @When("utilisateur clique sur le sous-sous-sous-menu {string}")
     public void utilisateur_clique_sur_le_sous_sous_sous_menu(String subsubsubmenu) {
-        homePage = new HomePage();
         homePage.clickOnSubSubSubMenu(subsubsubmenu);
     }
 
     @Then("le titre de la page est {string}")
     public void le_titre_de_la_page_est(String title) {
-        homePage = new HomePage();
+
         String actualTitle = homePage.getPageTitle();
+
         Assert.assertEquals(title, actualTitle);
-        Config.driver.quit();
     }
 }
