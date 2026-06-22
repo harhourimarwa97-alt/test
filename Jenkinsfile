@@ -12,7 +12,8 @@ pipeline {
         }
         stage('Test') {
             steps {
-                bat 'mvn clean test -Dfile.encoding=UTF-8'
+                bat 'mvn test -Dtest=TestRunner'
+                //bat 'mvn clean test -Dfile.encoding=UTF-8'
             }
         }
     }
