@@ -10,44 +10,35 @@ public class Config {
 
     public static WebDriver driver;
 
-    // Maximiser la fenêtre du navigateur
+    // Ouvrir le navigateur en plein écran
     public static void maximizeWindow() {
         driver.manage().window().maximize();
     }
 
-    // Configuration Chrome (compatible Jenkins + local)
+    // Configuration du navigateur Chrome
     public static void confChrome() {
 
         ChromeOptions options = new ChromeOptions();
 
-        // Mode headless pour exécution sur serveur / Jenkins
+        // Mode headless (important pour Jenkins / serveurs)
         options.addArguments("--headless=new");
 
-        // Sécurité et compatibilité Linux / Docker / CI
+        // Options nécessaires pour Linux / Jenkins
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--disable-gpu");
 
-        // Taille fixe de la fenêtre en mode headless
+        // Taille de la fenêtre en mode headless
         options.addArguments("--window-size=1920,1080");
 
-        // Compatibilité ChromeDriver / Chrome
-        options.addArguments("--remote-allow-origins=*");
-
-        // Désactivation des éléments inutiles du navigateur
-        options.addArguments("--disable-extensions");
-        options.addArguments("--disable-notifications");
-        options.addArguments("--disable-popup-blocking");
-        options.addArguments("--disable-infobars");
-
-        // Initialisation du driver Chrome
+        // Création du driver Chrome
         driver = new ChromeDriver(options);
 
-        // Attente implicite globale (simple mais suffisante pour début)
+        // Attente globale pour trouver les éléments
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
     }
 
-    // Modifier dynamiquement l'attente implicite
+    // Changer le temps d'attente si besoin
     public static void attente(int seconds) {
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(seconds));
     }
