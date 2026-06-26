@@ -12,7 +12,9 @@ public class Config {
 
     // Ouvrir le navigateur en plein écran
     public static void maximizeWindow() {
-        driver.manage().window().maximize();
+        if (driver != null) {
+            driver.manage().window().maximize();
+        }
     }
 
     // Configuration du navigateur Chrome
@@ -20,10 +22,10 @@ public class Config {
 
         ChromeOptions options = new ChromeOptions();
 
-        // Mode headless (important pour Jenkins / serveurs)
+        // Mode headless (important pour Jenkins / CI)
         options.addArguments("--headless=new");
 
-        // Options nécessaires pour Linux / Jenkins
+        // Options pour Linux / Jenkins
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--disable-gpu");
@@ -31,15 +33,17 @@ public class Config {
         // Taille de la fenêtre en mode headless
         options.addArguments("--window-size=1920,1080");
 
-        // Création du driver Chrome
+        // Initialisation du driver Chrome
         driver = new ChromeDriver(options);
 
         // Attente globale pour trouver les éléments
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
     }
 
-    // Changer le temps d'attente si besoin
+    // Modifier le temps d'attente
     public static void attente(int seconds) {
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(seconds));
+        if (driver != null) {
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(seconds));
+        }
     }
 }
