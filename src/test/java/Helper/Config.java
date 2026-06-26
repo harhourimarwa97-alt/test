@@ -10,50 +10,46 @@ public class Config {
 
     public static WebDriver driver;
 
-    public static void maximizewindow() {
+    // Maximiser la fenêtre (utile en mode non-headless)
+    public static void maximizeWindow() {
         driver.manage().window().maximize();
     }
 
+    // Configuration Chrome pour exécution locale + CI (Jenkins)
     public static void confChrome() {
 
         ChromeOptions options = new ChromeOptions();
 
-        // ✅ Mode Headless pour accélérer l'exécution sur Jenkins
+        // Mode headless (obligatoire pour Jenkins / serveurs sans interface graphique)
         options.addArguments("--headless=new");
 
+        // Sécurité et compatibilité Linux / Docker
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--disable-gpu");
 
-        // ✅ Taille fixe de la fenêtre pour éviter les problèmes d'affichage
+        // Taille fixe de la fenêtre (important en mode headless)
         options.addArguments("--window-size=1920,1080");
 
+        // Améliore la compatibilité avec certaines versions de ChromeDriver
         options.addArguments("--remote-allow-origins=*");
+
+        // Désactivation des éléments inutiles du navigateur
         options.addArguments("--disable-extensions");
-        options.addArguments("--disable-software-rasterizer");
-
-        // ✅ Désactivation des notifications Chrome
         options.addArguments("--disable-notifications");
-
-        // ✅ Désactivation du blocage des popups
         options.addArguments("--disable-popup-blocking");
-
-        // ✅ Désactivation des infobulles Chrome
         options.addArguments("--disable-infobars");
 
-        // Création du driver avec toutes les options définies
+        // Création du driver Chrome avec options
         driver = new ChromeDriver(options);
 
-        // ✅ Réduction de l'attente implicite de 10 s à 5 s pour améliorer les performances
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
-
-        // ✅ Maximisation automatique de la fenêtre
-        driver.manage().window().maximize();
+        // Timeout global pour les recherches d’éléments
+        // (simple et suffisant pour début, WebDriverWait est recommandé plus tard)
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
     }
 
-    // ⚠️ Il est préférable d'utiliser WebDriverWait au lieu de modifier
-    // l'implicitWait plusieurs fois durant l'exécution
-    public static void attente(int s) {
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(s));
+    // Méthode pour changer dynamiquement l’attente implicite
+    public static void attente(int seconds) {
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(seconds));
     }
 }
