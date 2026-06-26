@@ -11,10 +11,18 @@ import io.cucumber.java.en.When;
 
 public class LoginPageStepDef {
     @Given("utilisateur est sur la page de connexion")
-    public void utilisateur_est_sur_la_page_de_connexion() throws Exception{
-    	//Config.driver = new ChromeDriver();
-        Config.confChrome();
-        Config.maximizewindow();
+public void utilisateur_est_sur_la_page_de_connexion() throws Exception {
+
+    Config.confChrome();
+    Config.maximizeWindow(); // ✔ CORRIGÉ
+
+    Config.driver.get(Utils.getProperty("Erudaxis_link"));
+}
+    // @Given("utilisateur est sur la page de connexion")
+    // public void utilisateur_est_sur_la_page_de_connexion() throws Exception{
+    // 	//Config.driver = new ChromeDriver();
+    //     Config.confChrome();
+    //     Config.maximizewindow();
    /*     ChromeOptions options = new ChromeOptions();
 
         options.addArguments("--headless=new");
